@@ -2,13 +2,13 @@
 import { useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "@/components/ui/button";
-
+import { Input } from "@/components/ui/input";
 
 export default function App() {
   const [count, setCount] = useState(0);
   return (
 
-    <main className="flex flex-col items-center justify-center min-h-screen">
+    <main className="flex flex-col items-center justify-center min-h-screen w-full gap-4">
       <div className="flex w-full justify-center mb-10">
         <a href="https://nextjs.org/" target="_blank">
           <img src="/next.svg" className="logo inline-block" alt="Next.JS logo" />
@@ -24,6 +24,10 @@ export default function App() {
       <div className="card">
         <Button className="mr-2" onClick={() => setCount((count) => count + 1)}>Click Me</Button>
         <InputText value={count.toString()} />
+      </div>
+      <div className="card flex">
+        <Button className="mr-2" onClick={() => setCount((count) => count + 1)}>Click Me</Button>
+        <Input type="text" value={count.toString()} />
       </div>
       <p className="read-the-docs">Click on the Next and React logos to learn more</p>
     </main>
