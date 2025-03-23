@@ -2,16 +2,21 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
+import { generateCalendar, months, weekdays } from "@/lib/calendar"
+import { useState } from "react";
 
-export default function App() {  
-  return (   
-    <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+export default function App() {
+  const [month, setMonth] = useState(new Date().getMonth());
+  const [year, setYear] = useState(new Date().getFullYear());
+
+  return (
+    <main className="flex flex-col h-screen w-full">
+      <header className="flex bg-gray-700 h-12 shadow-md rounded-t-lg">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
-            <BreadcrumbList>             
+            <BreadcrumbList>
               <BreadcrumbItem>
                 <BreadcrumbPage>Home</BreadcrumbPage>
               </BreadcrumbItem>
@@ -19,15 +24,55 @@ export default function App() {
           </Breadcrumb>
         </div>
       </header>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
+      <section className="flex flex-col items-center h-screen w-full">
+        <div className="flex items-center justify-between w-full px-4 py-2  shadow-md">
+          <h1 className="text-2xl font-bold">Calendário</h1>
+          <div className="flex items-center gap-2">
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">Hoje</button>
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">Adicionar Evento</button>
+          </div>
         </div>
-        <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
-      </div>
-    </>
+        <div className="flex flex-col items-center gap-4 w-[351px] rounded-lg pt-4">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setYear(year - 1)}>&lt;</button>
+            <h2 className="text-xl font-semibold py-2">{`${year}`}</h2>
+            <button onClick={() => setYear(year + 1)}>&gt;</button>
+          </div>
 
-  );
+
+          <div className="flex items-center justify-between w-full px-4 py-2 rounded-lg shadow-md">
+            <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>&lt;</button>
+            <h2 className="text-xl font-semibold py-2">{months[month]}</h2>
+            <button onClick={() => setMonth((month + 1) % 12)}>&gt;</button>
+          </div>
+
+          <div className="flex gap-4">
+            {weekdays.map((day, index) => (
+              <div key={index} className="w-8 text-center font-semibold">
+                {day.substring(0, 3)}
+              </div>
+            ))}
+          </div>
+
+          {generateCalendar(month, year).map(
+            (week, index) => (
+              <div key={index} className="flex gap-4">
+                {week.map((day, dayIndex) => (
+                  <div key={dayIndex} className="text-center">
+                    {day !== null ? (
+                      <div className="w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300">
+                        {day}
+                      </div>
+                    ) : (
+                      <div className="w-8 h-8"></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+        </div>
+      </section>
+    </main>
+  )
 }
