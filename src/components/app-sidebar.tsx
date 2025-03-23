@@ -78,7 +78,7 @@ const data = {
       items: [
         {
           title: "Genesis",
-          url: "#",
+          url: "/models/genesis",
         },
         {
           title: "Explorer",
@@ -160,12 +160,12 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {}
 
 export function AppSidebar({ ...props }: AppSidebarProps) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={data.navMain}/>
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
