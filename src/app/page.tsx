@@ -2,12 +2,25 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
-import { generateCalendar, months, weekdays } from "@/lib/calendar"
-import { useState } from "react";
+import { generateCalendar, months, weekdays } from "@/lib/calendars/calendar"
+import { useState, useMemo } from "react";
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
   const [year, setYear] = useState(new Date().getFullYear());
+
+  // Memorização do calendário para evitar recálculos desnecessários
+  const calendar = useMemo(() => {
+    return generateCalendar(month, year);
+  }, [month, year]);
+
+  // Função para voltar ao dia atual
+  const goToToday = () => {
+    const today = new Date();
+    setMonth(today.getMonth());
+    setYear(today.getFullYear());
+  };
+
 
   return (
     <main className="flex flex-col h-screen w-full">
@@ -28,7 +41,7 @@ export default function App() {
         <div className="flex items-center justify-between w-full px-4 py-2  shadow-md">
           <h1 className="text-2xl font-bold">Calendário</h1>
           <div className="flex items-center gap-2">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">Hoje</button>
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg" onClick={goToToday}>Hoje</button>
             <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">Adicionar Evento</button>
           </div>
         </div>
@@ -48,19 +61,22 @@ export default function App() {
 
           <div className="flex gap-4">
             {weekdays.map((day, index) => (
-              <div key={index} className="w-8 text-center font-semibold">
+              <div key={index} className={`w-8 text-center font-semibold ${index === 0 ? 'text-red-600' : ''}`}>
                 {day.substring(0, 3)}
               </div>
             ))}
           </div>
 
-          {generateCalendar(month, year).map(
+          {calendar.map(
             (week, index) => (
               <div key={index} className="flex gap-4">
                 {week.map((day, dayIndex) => (
                   <div key={dayIndex} className="text-center">
                     {day !== null ? (
-                      <div className="w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300">
+                      <div
+                        className={`w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300 
+                        ${dayIndex === 0 ? 'border-red-800 border-2 text-red-800 font-bold' : ''} 
+                        ${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-blue-500 text-white' : ''}`}>
                         {day}
                       </div>
                     ) : (
