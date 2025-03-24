@@ -10,6 +10,7 @@ import { TooltipContent } from "@/components/ui/tooltip";
 import { TooltipTrigger } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
+import { Button } from "@/components/ui/button";
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -77,8 +78,8 @@ export default function App() {
 
 
   return (
-    <main className="flex flex-col h-screen w-full">
-      <header className="flex bg-gray-700 h-12 shadow-md rounded-t-lg">
+    <main className="flex flex-col h-[calc(100vh-1rem)] w-full">
+      <header className="flex bg-gray-700 h-14 shadow-md rounded-t-lg">
         <div className="flex items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
@@ -95,22 +96,21 @@ export default function App() {
         <div className="flex items-center justify-between w-full px-4 py-2  shadow-md">
           <h1 className="text-2xl font-bold">Calendário</h1>
           <div className="flex items-center gap-2">
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg" onClick={goToToday}>Hoje</button>
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg">Adicionar Evento</button>
+            <Button className="px-4 py-2 text-white rounded-lg" onClick={goToToday}>Hoje</Button>
           </div>
         </div>
         <div className="flex flex-col items-center gap-4 w-[351px] rounded-lg pt-4">
           <div className="flex items-center gap-4">
-            <button onClick={() => setYear(year - 1)}>&lt;</button>
-            <h2 className="text-xl font-semibold py-2">{`${year}`}</h2>
-            <button onClick={() => setYear(year + 1)}>&gt;</button>
+            <Button onClick={() => setYear(year - 1)}>&lt;</Button>
+            <h2 className="text-xl font-semibold py-2 px-4">{`${year}`}</h2>
+            <Button onClick={() => setYear(year + 1)}>&gt;</Button>
           </div>
 
 
-          <div className="flex items-center justify-between w-full px-4 py-2 rounded-lg shadow-md">
-            <button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>&lt;</button>
+          <div className="flex items-center justify-between w-full px-4 py-2 rounded-lg shadow-lg dark:bg-gray-800 bg-gray-200">
+            <Button onClick={() => setMonth(month === 0 ? 11 : month - 1)}>&lt;</Button>
             <h2 className="text-xl font-semibold py-2">{months[month]}</h2>
-            <button onClick={() => setMonth((month + 1) % 12)}>&gt;</button>
+            <Button onClick={() => setMonth((month + 1) % 12)}>&gt;</Button>
           </div>
 
           <div className="flex gap-4">
@@ -177,8 +177,8 @@ export default function App() {
             ))
           }
         </div>
-        <div className="mt-4 w-full">
-          <h3 className="text-lg font-semibold">Feriados em {months[month]}</h3>
+        <div className="pt-4 pl-8 w-full">
+          <h3 className="text-lg font-semibold">Feriados do mês de {months[month]}</h3>
           {feriadosDoMesAtual.length > 0 ? (
             <ul className="mt-2">
               {feriadosDoMesAtual.map((feriado, index) => (
