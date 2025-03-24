@@ -4,7 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { generateCalendar, months, weekdays } from "@/lib/calendars/calendar"
 import { useState, useMemo, useCallback } from "react";
-import { verificarFeriado, getTodosFeriados } from '@/lib/calendars/feriados';
+import { getTodosFeriados } from '@/lib/calendars/feriados';
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -18,7 +18,27 @@ export default function App() {
   // Memoriza todos os feriados do ano atual
   const feriados = useMemo(() => {
     // Obter todos os feriados nacionais e facultativos
-    return getTodosFeriados(year, ['nacional', 'facultativo']);
+    return getTodosFeriados(year, ['nacional', 'estadual', 'municipal', 'facultativo']);
+  }, [year]);
+
+  const feriadosNacionais = useMemo(() => {
+    // Obter todos os feriados nacionais e facultativos
+    return getTodosFeriados(year, ['nacional']);
+  }, [year]);
+
+  const feriadosFacultativos = useMemo(() => {
+    // Obter todos os feriados nacionais e facultativos
+    return getTodosFeriados(year, ['facultativo']);
+  }, [year]);
+
+  const feriadosEstaduais = useMemo(() => {
+    // Obter todos os feriados estaduais
+    return getTodosFeriados(year, ['estadual']);
+  }, [year]);
+
+  const feriadosMunicipais = useMemo(() => {
+    // Obter todos os feriados municipais
+    return getTodosFeriados(year, ['municipal']);
   }, [year]);
 
   // Filtra feriados apenas do mês atual
@@ -26,10 +46,14 @@ export default function App() {
     return feriados.filter(feriado => feriado.mes === month + 1);
   }, [feriados, month]);
 
-  const isFeriado = useCallback((dia: number, mes: number) => {
-    return feriados.some(feriado => feriado.dia === dia && feriado.mes === mes);
-  }, [feriados]);
-  
+  const isFeriadoNacional = useCallback((dia: number, mes: number) => {
+    return feriadosNacionais.some(feriado => feriado.dia === dia && feriado.mes === mes);
+  }, [feriadosNacionais]);
+
+  const isFacultativo = useCallback((dia: number, mes: number) => {
+    return feriadosFacultativos.some(feriado => feriado.dia === dia && feriado.mes === mes);
+  }, [feriadosFacultativos]);
+
   const getNomeFeriado = useCallback((dia: number, mes: number) => {
     const feriado = feriados.find(f => f.dia === dia && f.mes === mes);
     return feriado ? feriado.nome : '';
@@ -95,10 +119,11 @@ export default function App() {
                   <div key={dayIndex} className="text-center">
                     {day !== null ? (
                       <div
-                        title={getNomeFeriado(day, month + 1)}
+                        title={`${getNomeFeriado(day, month + 1)}`}
                         className={`w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300 
                         ${dayIndex === 0 ? 'border-red-800 border-2 text-red-800 font-bold' : ''}
-                        ${isFeriado(day, month + 1) ? 'bg-orange-300 font-bold text-black cursor-pointer' : ''}
+                        ${isFeriadoNacional(day, month + 1) ? 'bg-orange-300 font-bold text-black cursor-pointer' : ''}
+                        ${isFacultativo(day, month + 1) ? 'bg-fuchsia-300 font-bold text-black cursor-pointer' : ''}
                         ${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-blue-500 text-white' : ''}`}>
                         {day}
                       </div>
@@ -111,24 +136,24 @@ export default function App() {
             ))
           }
         </div>
+        <div className="mt-4 w-full">
+          <h3 className="text-lg font-semibold">Feriados em {months[month]}</h3>
+          {feriadosDoMesAtual.length > 0 ? (
+            <ul className="mt-2">
+              {feriadosDoMesAtual.map((feriado, index) => (
+                <li key={index} className={`text-sm ${feriado.tipo === 'nacional' ? 'font-bold' : ''}`}>
+                  {feriado.dia} - {feriado.nome}
+                  <span className="text-xs ml-2 text-gray-500">
+                    ({feriado.tipo === 'nacional' ? 'Nacional' : 'Facultativo'})
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500">Não há feriados neste mês.</p>
+          )}
+        </div>
       </section>
-      <div className="mt-4 w-full">
-        <h3 className="text-lg font-semibold">Feriados em {months[month]}</h3>
-        {feriadosDoMesAtual.length > 0 ? (
-          <ul className="mt-2">
-            {feriadosDoMesAtual.map((feriado, index) => (
-              <li key={index} className={`text-sm ${feriado.tipo === 'nacional' ? 'font-bold' : ''}`}>
-                {feriado.dia} - {feriado.nome}
-                <span className="text-xs ml-2 text-gray-500">
-                  ({feriado.tipo === 'nacional' ? 'Nacional' : 'Facultativo'})
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-gray-500">Não há feriados neste mês.</p>
-        )}
-      </div>
     </main>
   )
 }
