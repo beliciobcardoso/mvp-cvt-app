@@ -88,15 +88,15 @@ function printCalendar(month: number, year: number): void {
 }
 
 // Exemplo de uso - crie um calendário para o mês atual
-const currentMonth = new Date().getMonth();
-const currentYear = new Date().getFullYear();
+// const currentMonth = new Date().getMonth();
+// const currentYear = new Date().getFullYear();
 
 // Para testar com o mês que você já estava usando (índice 3 = abril)
-const mes = 3;
-printCalendar(mes, currentYear);
+// const mes = 3;
+// printCalendar(mes, currentYear);
 
 // Para testar com o mês atual
-printCalendar(currentMonth, currentYear);
+// printCalendar(currentMonth, currentYear);
 
 export { generateCalendar, printCalendar, months, weekdays };
 export type { CalendarType };

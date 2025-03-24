@@ -5,6 +5,11 @@ import { Separator } from "@radix-ui/react-separator";
 import { generateCalendar, months, weekdays } from "@/lib/calendars/calendar"
 import { useState, useMemo, useCallback } from "react";
 import { getTodosFeriados } from '@/lib/calendars/feriados';
+import { Tooltip } from "@/components/ui/tooltip";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipArrow } from "@radix-ui/react-tooltip";
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -45,6 +50,10 @@ export default function App() {
   const feriadosDoMesAtual = useMemo(() => {
     return feriados.filter(feriado => feriado.mes === month + 1);
   }, [feriados, month]);
+
+  const isFeriado = useCallback((dia: number, mes: number) => {
+    return feriados.some(feriado => feriado.dia === dia && feriado.mes === mes);
+  }, [feriados]);
 
   const isFeriadoNacional = useCallback((dia: number, mes: number) => {
     return feriadosNacionais.some(feriado => feriado.dia === dia && feriado.mes === mes);
@@ -118,15 +127,47 @@ export default function App() {
                 {week.map((day, dayIndex) => (
                   <div key={dayIndex} className="text-center">
                     {day !== null ? (
-                      <div
-                        title={`${getNomeFeriado(day, month + 1)}`}
-                        className={`w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300 
-                        ${dayIndex === 0 ? 'border-red-800 border-2 text-red-800 font-bold' : ''}
-                        ${isFeriadoNacional(day, month + 1) ? 'bg-orange-300 font-bold text-black cursor-pointer' : ''}
-                        ${isFacultativo(day, month + 1) ? 'bg-fuchsia-300 font-bold text-black cursor-pointer' : ''}
-                        ${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-blue-500 text-white' : ''}`}>
-                        {day}
-                      </div>
+                      <>{
+                        isFeriado(day, month + 1) ? (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <div
+                                  className={`w-8 h-8 flex items-center justify-center border rounded-lg tooltip-${day}-${month}                               
+                                  ${isFeriadoNacional(day, month + 1) ? 'bg-orange-300 font-bold text-black cursor-pointer' : ''}
+                                  ${isFacultativo(day, month + 1) ? 'bg-fuchsia-300 font-bold text-black cursor-pointer' : ''}
+                               `}>
+                                  {day}
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="">
+                                <div className="flex flex-col">
+                                  {isFeriado(day, month + 1) && (
+                                    <>
+                                      <span className="font-bold text-lg">{getNomeFeriado(day, month + 1)}</span>
+                                      <span className=" text-gray-900">
+                                        {isFeriadoNacional(day, month + 1) ? 'Nacional' : 'Facultativo'}
+                                      </span>
+                                    </>
+                                  )}                                  
+                                </div>
+                                <TooltipArrow className="fill-current h-7 w-6 text-orange-600" />
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        ) : (
+                          <div
+                          title={`${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 
+                            ("Hoje"):("")}`}
+                          className={`
+                            ${dayIndex === 0 ? 'border-red-800 text-red-800 font-bold' : ''}
+                            w-8 h-8 flex items-center justify-center rounded-2xl 
+                           ${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-blue-500 text-white' : ''}
+                            `}>
+                            {day}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <div className="w-8 h-8"></div>
                     )}
