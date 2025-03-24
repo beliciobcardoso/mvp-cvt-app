@@ -3,7 +3,8 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbPage } from "@/co
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
 import { generateCalendar, months, weekdays } from "@/lib/calendars/calendar"
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { verificarFeriado, getTodosFeriados } from '@/lib/calendars/feriados';
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -13,6 +14,26 @@ export default function App() {
   const calendar = useMemo(() => {
     return generateCalendar(month, year);
   }, [month, year]);
+
+  // Memoriza todos os feriados do ano atual
+  const feriados = useMemo(() => {
+    // Obter todos os feriados nacionais e facultativos
+    return getTodosFeriados(year, ['nacional', 'facultativo']);
+  }, [year]);
+
+  // Filtra feriados apenas do mês atual
+  const feriadosDoMesAtual = useMemo(() => {
+    return feriados.filter(feriado => feriado.mes === month + 1);
+  }, [feriados, month]);
+
+  const isFeriado = useCallback((dia: number, mes: number) => {
+    return feriados.some(feriado => feriado.dia === dia && feriado.mes === mes);
+  }, [feriados]);
+  
+  const getNomeFeriado = useCallback((dia: number, mes: number) => {
+    const feriado = feriados.find(f => f.dia === dia && f.mes === mes);
+    return feriado ? feriado.nome : '';
+  }, [feriados]);
 
   // Função para voltar ao dia atual
   const goToToday = () => {
@@ -74,8 +95,10 @@ export default function App() {
                   <div key={dayIndex} className="text-center">
                     {day !== null ? (
                       <div
+                        title={getNomeFeriado(day, month + 1)}
                         className={`w-8 h-8 flex items-center justify-center border rounded-lg border-slate-300 
-                        ${dayIndex === 0 ? 'border-red-800 border-2 text-red-800 font-bold' : ''} 
+                        ${dayIndex === 0 ? 'border-red-800 border-2 text-red-800 font-bold' : ''}
+                        ${isFeriado(day, month + 1) ? 'bg-orange-300 font-bold text-black cursor-pointer' : ''}
                         ${day === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear() ? 'bg-blue-500 text-white' : ''}`}>
                         {day}
                       </div>
@@ -89,6 +112,23 @@ export default function App() {
           }
         </div>
       </section>
+      <div className="mt-4 w-full">
+        <h3 className="text-lg font-semibold">Feriados em {months[month]}</h3>
+        {feriadosDoMesAtual.length > 0 ? (
+          <ul className="mt-2">
+            {feriadosDoMesAtual.map((feriado, index) => (
+              <li key={index} className={`text-sm ${feriado.tipo === 'nacional' ? 'font-bold' : ''}`}>
+                {feriado.dia} - {feriado.nome}
+                <span className="text-xs ml-2 text-gray-500">
+                  ({feriado.tipo === 'nacional' ? 'Nacional' : 'Facultativo'})
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-gray-500">Não há feriados neste mês.</p>
+        )}
+      </div>
     </main>
   )
 }
