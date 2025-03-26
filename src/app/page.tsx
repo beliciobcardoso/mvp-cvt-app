@@ -11,6 +11,7 @@ import { TooltipTrigger } from "@/components/ui/tooltip";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 import { Button } from "@/components/ui/button";
+import { CalendarConfig } from "@/components/calendar/calendar-config";
 
 export default function App() {
   const [month, setMonth] = useState(new Date().getMonth());
@@ -97,6 +98,7 @@ export default function App() {
           <h1 className="text-2xl font-bold">Calendário</h1>
           <div className="flex items-center gap-2">
             <Button className="px-4 py-2 text-white rounded-lg" onClick={goToToday}>Hoje</Button>
+            <CalendarConfig/>
           </div>
         </div>
         <div className="flex flex-col items-center gap-4 w-[351px] rounded-lg pt-4">
